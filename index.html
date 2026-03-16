@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Name — Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Joan&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:        #F7F5F5;
+      --surface:   #EDECEA;
+      --border:    #DED9E0;
+      --text:      #1A1916;
+      --muted:     #7A7870;
+      --accent:    #785A8B;
+      --radius:    10px;
+      --font:      'Plus Jakarta Sans', sans-serif;
+      --font-joan: 'Joan', serif;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ─────────────────────────────────── */
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+    }
+
+    /* ── Nav ─────────────────────────────────────── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 28px 0 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-name {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--text);
+    }
+
+    .nav-links a.active {
+      font-weight: 500;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .header {
+      padding: 44px 0 28px;
+    }
+
+    .header h1 {
+      font-family: var(--font-joan);
+      font-size: 42px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+
+    .header .subtitle {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .header .intro {
+      font-family: var(--font-joan);
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text);
+      max-width: 580px;
+      font-weight: 400;
+    }
+
+    .header-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-bottom span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Download button ─────────────────────────── */
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 18px;
+      border-radius: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+
+    .btn-download:hover {
+      opacity: 0.8;
+    }
+
+    .btn-download svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    /* ── PDF viewer ──────────────────────────────── */
+    .pdf-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .pdf-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .pdf-filename {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .pdf-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .pdf-topbar-actions a {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s;
+    }
+
+    .pdf-topbar-actions a:hover {
+      color: var(--text);
+    }
+
+    .pdf-topbar-actions svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .pdf-viewer {
+      width: 100%;
+      height: 82vh;
+      min-height: 500px;
+      border: none;
+      display: block;
+    }
+
+    /* ── Footer ──────────────────────────────────── */
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    footer .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    footer .footer-links a {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    footer .footer-links a:hover {
+      color: var(--text);
+    }
+
+    /* ── Fade-in ─────────────────────────────────── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    .fade-in:nth-child(1) { animation-delay: 0.05s; }
+    .fade-in:nth-child(2) { animation-delay: 0.12s; }
+    .fade-in:nth-child(3) { animation-delay: 0.2s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: none; }
+    }
+
+    @media (max-width: 560px) {
+      .header h1 { font-size: 32px; }
+      .header-bottom { flex-direction: column; align-items: flex-start; }
+      .nav-links { gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <nav class="fade-in">
+      <ul class="nav-links">
+        <li><a href="https://resume.domain.com" class="active">resume</a></li>
+        <li><a href="https://work.domain.com">work</a></li>
+      </ul>
+    </nav>
+
+    <div class="header fade-in">
+      <h1>Your Name</h1>
+      <p class="subtitle">Product Designer, Berlin</p>
+      <p class="intro">Hello, my resume lives here. You can read about the work I have done, my strengths and achievements. You are welcome to download it as a file for your records.</p>
+      <div class="header-bottom">
+        <a class="btn-download" href="resume.pdf" download>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 2v8M5 7l3 3 3-3M2 13h12"/>
+          </svg>
+          download pdf
+        </a>
+      </div>
+    </div>
+
+    <div class="pdf-wrap fade-in">
+      <div class="pdf-topbar">
+        <span class="pdf-filename">resume.pdf</span>
+      </div>
+      <iframe
+        class="pdf-viewer"
+        src="resume.pdf"
+        title="Resume PDF"
+      ></iframe>
+    </div>
+
+    <footer>
+      <span>© 2026 Your Name</span>
+      <div class="footer-links">
+        <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin</a>
+        <a href="/cdn-cgi/l/email-protection#fb82948ebb9f94969a9295d5989496">email</a>
+      </div>
+   
