@@ -160,11 +160,17 @@
     }
 
     /* ── PDF viewer ──────────────────────────────── */
+    .pdf-outer {
+      display: flex;
+      justify-content: center;
+    }
+
     .pdf-wrap {
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       background: var(--surface);
+      width: 85%;
     }
 
     .pdf-topbar {
@@ -182,40 +188,62 @@
       font-weight: 400;
     }
 
-    .pdf-topbar-actions {
+    .pdf-toolbar {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
-    .pdf-topbar-actions a {
+    .pdf-page-count {
       font-size: 12px;
       color: var(--muted);
-      text-decoration: none;
+    }
+
+    .pdf-zoom {
       display: flex;
       align-items: center;
       gap: 4px;
-      transition: color 0.15s;
     }
 
-    .pdf-topbar-actions a:hover {
+    .pdf-zoom button {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      font-size: 14px;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, border-color 0.15s;
+      font-family: var(--font);
+      line-height: 1;
+    }
+
+    .pdf-zoom button:hover {
       color: var(--text);
+      border-color: var(--text);
     }
 
-    .pdf-topbar-actions svg {
-      width: 12px;
-      height: 12px;
+    .pdf-zoom-level {
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 36px;
+      text-align: center;
     }
 
     .pdf-viewer {
       display: block;
       padding: 24px;
+      background: #E8E6E6;
     }
 
     .pdf-canvas-wrap {
-      margin: 0 auto 20px;
+      margin: 0 auto 16px;
       display: block;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.12);
     }
 
     .pdf-canvas-wrap:last-child {
@@ -308,11 +336,21 @@
       </div>
     </div>
 
-    <div class="pdf-wrap fade-in">
-      <div class="pdf-topbar">
-        <span class="pdf-filename">Alisa_Arama_CV.pdf</span>
+    <div class="pdf-outer fade-in">
+      <div class="pdf-wrap">
+        <div class="pdf-topbar">
+          <span class="pdf-filename">Alisa_Arama_CV.pdf</span>
+          <div class="pdf-toolbar">
+            <span class="pdf-page-count" id="page-count">— / —</span>
+            <div class="pdf-zoom">
+              <button id="zoom-out" title="Zoom out">−</button>
+              <span class="pdf-zoom-level" id="zoom-level">100%</span>
+              <button id="zoom-in" title="Zoom in">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="pdf-viewer" id="pdf-viewer"></div>
       </div>
-      <div class="pdf-viewer" id="pdf-viewer"></div>
     </div>
 
     <footer>
@@ -329,13 +367,26 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    async function renderPDF() {
-      const container = document.getElementById('pdf-viewer');
-      const pdf = await pdfjsLib.getDocument('Alisa_Arama_CV.pdf').promise;
+    let pdfDoc = null;
+    let zoomLevel = 1.0;
+    const dpr = window.devicePixelRatio || 1;
+    const container = document.getElementById('pdf-viewer');
+    const pageCountEl = document.getElementById('page-count');
+    const zoomLevelEl = document.getElementById('zoom-level');
 
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const scale = 2; // retina quality
+    const BASE = 3;
+
+    async function renderPDF() {
+      pdfDoc = await pdfjsLib.getDocument('Alisa_Arama_CV.pdf').promise;
+      pageCountEl.textContent = `1–${pdfDoc.numPages} / ${pdfDoc.numPages}`;
+      await renderAllPages();
+    }
+
+    async function renderAllPages() {
+      container.innerHTML = '';
+      for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+        const page = await pdfDoc.getPage(pageNum);
+        const scale = BASE * zoomLevel;
         const viewport = page.getViewport({ scale });
 
         const wrap = document.createElement('div');
@@ -344,6 +395,8 @@
         const canvas = document.createElement('canvas');
         canvas.width = viewport.width;
         canvas.height = viewport.height;
+        canvas.style.width = (viewport.width / BASE) + 'px';
+        canvas.style.height = (viewport.height / BASE) + 'px';
 
         wrap.appendChild(canvas);
         container.appendChild(wrap);
@@ -354,6 +407,20 @@
         }).promise;
       }
     }
+
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      if (zoomLevel >= 2.0) return;
+      zoomLevel = Math.round((zoomLevel + 0.25) * 100) / 100;
+      zoomLevelEl.textContent = Math.round(zoomLevel * 100) + '%';
+      renderAllPages();
+    });
+
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      if (zoomLevel <= 0.5) return;
+      zoomLevel = Math.round((zoomLevel - 0.25) * 100) / 100;
+      zoomLevelEl.textContent = Math.round(zoomLevel * 100) + '%';
+      renderAllPages();
+    });
 
     renderPDF();
   </script>
