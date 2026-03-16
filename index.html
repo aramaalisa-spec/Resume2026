@@ -309,9 +309,13 @@
     }
 
     @media (max-width: 560px) {
-      .header h1 { font-size: 32px; }
+      .page { padding: 0 16px 48px; }
+      .header h1 { font-size: 26px; }
       .header-bottom { flex-direction: column; align-items: flex-start; }
       .nav-links { gap: 18px; }
+      .pdf-outer { width: 100%; }
+      .pdf-wrap { width: 90%; }
+      .pdf-viewer { padding: 12px; }
     }
   </style>
 </head>
@@ -372,14 +376,17 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     let pdfDoc = null;
-    let zoomLevel = 1.0;
+    let zoomLevel = 1.25;
     const dpr = window.devicePixelRatio || 1;
     const container = document.getElementById('pdf-viewer');
     const pageCountEl = document.getElementById('page-count');
     const zoomLevelEl = document.getElementById('zoom-level');
+    zoomLevelEl.textContent = '125%';
 
     const BASE = 3;
     let observer = null;
+
+    function isMobile() { return window.innerWidth <= 560; }
 
     async function renderPDF() {
       pdfDoc = await pdfjsLib.getDocument('Alisa_Arama_CV.pdf').promise;
@@ -390,9 +397,20 @@
     async function renderAllPages() {
       if (observer) observer.disconnect();
       container.innerHTML = '';
+
       for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
         const page = await pdfDoc.getPage(pageNum);
-        const scale = BASE * zoomLevel;
+
+        // on mobile: fit page to container width
+        let scale;
+        if (isMobile()) {
+          const fitViewport = page.getViewport({ scale: 1 });
+          const containerWidth = container.clientWidth - 24; // subtract padding
+          scale = (containerWidth / fitViewport.width) * dpr;
+        } else {
+          scale = BASE * zoomLevel;
+        }
+
         const viewport = page.getViewport({ scale });
 
         const wrap = document.createElement('div');
@@ -402,8 +420,8 @@
         const canvas = document.createElement('canvas');
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-        canvas.style.width = (viewport.width / BASE) + 'px';
-        canvas.style.height = (viewport.height / BASE) + 'px';
+        canvas.style.width = (viewport.width / (isMobile() ? dpr : BASE)) + 'px';
+        canvas.style.height = (viewport.height / (isMobile() ? dpr : BASE)) + 'px';
 
         wrap.appendChild(canvas);
         container.appendChild(wrap);
