@@ -241,6 +241,8 @@
       align-items: center;
       padding: 24px;
       background: #E8E6E6;
+      height: 67vh;
+      overflow-y: auto;
     }
 
     .pdf-canvas-wrap {
@@ -377,14 +379,16 @@
     const zoomLevelEl = document.getElementById('zoom-level');
 
     const BASE = 3;
+    let observer = null;
 
     async function renderPDF() {
       pdfDoc = await pdfjsLib.getDocument('Alisa_Arama_CV.pdf').promise;
-      pageCountEl.textContent = `1–${pdfDoc.numPages} / ${pdfDoc.numPages}`;
+      pageCountEl.textContent = `1 / ${pdfDoc.numPages}`;
       await renderAllPages();
     }
 
     async function renderAllPages() {
+      if (observer) observer.disconnect();
       container.innerHTML = '';
       for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
         const page = await pdfDoc.getPage(pageNum);
@@ -393,6 +397,7 @@
 
         const wrap = document.createElement('div');
         wrap.className = 'pdf-canvas-wrap';
+        wrap.dataset.page = pageNum;
 
         const canvas = document.createElement('canvas');
         canvas.width = viewport.width;
@@ -408,6 +413,19 @@
           viewport
         }).promise;
       }
+
+      observer = new IntersectionObserver((entries) => {
+        let best = null, maxRatio = 0;
+        entries.forEach(e => {
+          if (e.intersectionRatio > maxRatio) {
+            maxRatio = e.intersectionRatio;
+            best = e.target;
+          }
+        });
+        if (best) pageCountEl.textContent = `${best.dataset.page} / ${pdfDoc.numPages}`;
+      }, { root: container, threshold: Array.from({length: 11}, (_, i) => i * 0.1) });
+
+      container.querySelectorAll('.pdf-canvas-wrap').forEach(el => observer.observe(el));
     }
 
     document.getElementById('zoom-in').addEventListener('click', () => {
