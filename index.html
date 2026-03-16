@@ -208,12 +208,24 @@
     }
 
     .pdf-viewer {
-      width: calc(100% + 4px);
-      margin-left: -2px;
-      height: 82vh;
-      min-height: 500px;
-      border: none;
       display: block;
+      padding: 24px;
+    }
+
+    .pdf-canvas-wrap {
+      margin: 0 auto 20px;
+      display: block;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .pdf-canvas-wrap:last-child {
+      margin-bottom: 0;
+    }
+
+    .pdf-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
     /* ── Footer ──────────────────────────────────── */
@@ -300,11 +312,7 @@
       <div class="pdf-topbar">
         <span class="pdf-filename">Alisa_Arama_CV.pdf</span>
       </div>
-      <iframe
-        class="pdf-viewer"
-        src="Alisa_Arama_CV.pdf#zoom=100"
-        title="Alisa Arama Resume PDF"
-      ></iframe>
+      <div class="pdf-viewer" id="pdf-viewer"></div>
     </div>
 
     <footer>
@@ -316,5 +324,38 @@
     </footer>
 
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    async function renderPDF() {
+      const container = document.getElementById('pdf-viewer');
+      const pdf = await pdfjsLib.getDocument('Alisa_Arama_CV.pdf').promise;
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const scale = 2; // retina quality
+        const viewport = page.getViewport({ scale });
+
+        const wrap = document.createElement('div');
+        wrap.className = 'pdf-canvas-wrap';
+
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        wrap.appendChild(canvas);
+        container.appendChild(wrap);
+
+        await page.render({
+          canvasContext: canvas.getContext('2d'),
+          viewport
+        }).promise;
+      }
+    }
+
+    renderPDF();
+  </script>
 </body>
 </html><
